@@ -59,3 +59,40 @@ export const getClassGroupMessages = async (req, res) => {
      }
 }
 
+/** getStudyMaterial function
+ * this function retrieves the study material for a student's class and semester.
+ * It first fetches the class details from the classes collection using the student's class,
+ * then it searches for the specific semester within that class to get the study material.
+ * It returns the study material in the response.
+ * @param {*} req 
+ * @param {*} res 
+ * @returns the study material for the student's class and semester
+ * 
+ */
+export const getStudyMaterial = async (req, res) => {
+     try{
+          //get the student details from the req 
+          const { studentDetails } = req;
+          const studentClass = await classesModel.findOne({ class: studentDetails.class }).lean();
+          if (!studentClass) {
+               return res.status(404).json({ message: "Class not found" });
+          }
+          console.log(studentDetails);
+          console.log(studentClass)
+          //find the study material for the student's class and semester
+          const studentSemester = studentClass.semesters.find(sem => sem.semester == studentDetails.classSemester);
+          if( !studentSemester || !studentSemester.studyMaterials) {
+               return res.status(404).json({ message: "Study material not found for the specified semester" });
+          }
+          return res.status(200).json({
+               message: "Study material fetched successfully",
+               studyMaterial: studentSemester.studyMaterials
+          });
+
+          
+     }catch(e){
+          console.error("Error fetching study material:", e);
+          return res.status(500).json({ message: "Internal server error" });
+     }
+}
+
