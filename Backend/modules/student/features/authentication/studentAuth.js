@@ -1,5 +1,5 @@
-import studentsModel from "../../../../db/models/students.model";
-import { jwtSign, jwtVerify } from "../../../../configs/jwt.config";
+import studentsModel from "../../../../db/models/students.model.js";
+import { jwtSign, jwtVerify } from "../../../../configs/jwt.config.js";
 import { cookieOptions } from "../../../../configs/cookie.config.js";
 
 /** loginStudent function 
@@ -17,6 +17,13 @@ import { cookieOptions } from "../../../../configs/cookie.config.js";
  * and generates a new JWT token if the token is valid.
  * It then sets the new token in a cookie and returns the student details.
  * If the token is invalid or not provided, it returns an error response.
+ */
+
+/**AuthenticateStudent function
+ * this function is a middleware that authenticates the student
+ * by checking the student token in the cookies.
+ * It verifies the token and checks if the student exists in the database.
+ * If the student is authenticated, it sets the student details in the request object for further use
  */
 
 export const loginStudent = async (req,res)=> {
@@ -58,7 +65,7 @@ export const refreshStudentToken = async (req, res) => {
                return res.status(401).json({ message: "No token provided! Login again" });
           }
           //verify the token and extract rollNo and phone
-          const { rollNo,phone} = jwtVerify(studentToken);
+          const { rollNo,phone} = await jwtVerify(studentToken);
           if (!rollNo || !phone) {
                return res.status(400).json({ message: "Invalid token! Login again" });
           }
@@ -93,7 +100,7 @@ export const authenticateStudent = async (req, res, next) => {
           }
 
           //verify the token
-          const { rollNo, phone } = jwtVerify(studentToken);
+          const { rollNo, phone } = await jwtVerify(studentToken);
           if (!rollNo || !phone) {
                return res.status(400).json({ message: "Invalid token! Login again" });
           }

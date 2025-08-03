@@ -1,27 +1,28 @@
 import mongoose from "mongoose";
 
 const classSchema = new mongoose.Schema({
-     className: {
+     class: {
           type: String,
           required: true,
      },
-     classID:{
-          type: Number,
-          required: true,
+     // classID is the unique identifier for the class
+     classID: {
+          type: mongoose.Schema.Types.ObjectId,
+          default: new mongoose.Types.ObjectId(),
           unique: true,
+          required: true
      },
-     semesters:{
+     semesters:[{
           semester:{
                type: Number,
                required: true,
           },
           classGroup:{
                messages:[{
-                    type: String,
                     important:Boolean,
                     message: String,
-                    image: { type: String },
-                    document: { type: String },
+                    image: String,
+                    document: String,
                     time: { type: Date, default: Date.now },
                }]
           },
@@ -40,6 +41,6 @@ const classSchema = new mongoose.Schema({
                time: { type: Date, default: Date.now }
                
           }],
-     }
+     }]
 });
 export default mongoose.model("classes", classSchema);
