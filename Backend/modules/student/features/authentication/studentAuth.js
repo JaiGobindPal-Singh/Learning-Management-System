@@ -34,7 +34,8 @@ export const loginStudent = async (req,res)=> {
                return res.status(400).json({message: "Roll number and phone number are required"});
           }
           //check if the student exists in the database and extract the student details
-          const student = await studentsModel.findOne({rollNo, phone});
+          //used the lean method for the optimization bcs we don't need the mongoose document methods here
+          const student = await studentsModel.findOne({rollNo, phone}).lean();
           if(!student){
                return res.status(404).json({message: "Invalid roll number or phone number"});
           }
@@ -49,7 +50,9 @@ export const loginStudent = async (req,res)=> {
                     rollNo: student.rollNo,
                     email: student.email,
                     profilePicture: student.profilePicture,
-                    phone: student.phone
+                    phone: student.phone,
+                    class: student.class,
+                    classSemester:student.classSemester
                }
           });
      }catch(e){
@@ -69,7 +72,7 @@ export const refreshStudentToken = async (req, res) => {
           if (!rollNo || !phone) {
                return res.status(400).json({ message: "Invalid token! Login again" });
           }
-          const student = await studentsModel.findOne({ rollNo, phone });
+          const student = await studentsModel.findOne({ rollNo, phone }).lean();
           if (!student) {
                return res.status(404).json({ message: "Invalid roll number or phone number" });
           }
@@ -83,7 +86,9 @@ export const refreshStudentToken = async (req, res) => {
                     rollNo: student.rollNo,
                     email: student.email,
                     profilePicture: student.profilePicture,
-                    phone: student.phone
+                    phone: student.phone,
+                    class: student.class,
+                    classSemester: student.classSemester
                }
           });
      } catch (e) {

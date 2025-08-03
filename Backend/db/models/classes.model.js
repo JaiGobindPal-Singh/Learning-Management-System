@@ -16,6 +16,7 @@ const classSchema = new mongoose.Schema({
           semester:{
                type: Number,
                required: true,
+               unique: true,
           },
           classGroup:{
                messages:[{

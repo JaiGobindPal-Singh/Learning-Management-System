@@ -24,6 +24,14 @@ const studentSchema = new mongoose.Schema({
           type: Number,
           required: true,
           unique: true,
-     }
+     },
+     class: {
+          type: String,
+          required: true,
+     },
+     classSemester: {
+          type: Number,
+          required: true,
+     },
 });
 export default mongoose.model("students", studentSchema);
