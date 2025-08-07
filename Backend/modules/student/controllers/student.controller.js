@@ -1,3 +1,8 @@
+/**
+ * @fileoverview Student Controller Module
+ * Contains functions for handling student-related operations such as login, token refresh, fetching announcements, class group messages, study materials, and assignments.
+ */
+
 // reexport the auth functions for use in routes
 export { loginStudent, refreshStudentToken, authenticateStudent } from "../features/authentication/studentAuth.js";
 import announcementsModel from "../../../db/models/announcements.model.js";
@@ -77,8 +82,6 @@ export const getStudyMaterial = async (req, res) => {
           if (!studentClass) {
                return res.status(404).json({ message: "Class not found" });
           }
-          console.log(studentDetails);
-          console.log(studentClass)
           //find the study material for the student's class and semester
           const studentSemester = studentClass.semesters.find(sem => sem.semester == studentDetails.classSemester);
           if( !studentSemester || !studentSemester.studyMaterials) {
@@ -96,3 +99,34 @@ export const getStudyMaterial = async (req, res) => {
      }
 }
 
+/**getAssignments function
+ * this function retrieves the assignments for a student's class and semester.
+ * It first fetches the class details from the classes collection using the student's class,
+ * then it searches for the specific semester within that class to get the assignments.
+ * It returns the assignments in the response.
+ * @param {*} req
+ * @param {*} res
+ * @returns the assignments for the student's class and semester
+ */
+export const getAssignments = async (req, res) => {
+     try{
+          //get the student details from the req 
+          const { studentDetails } = req;
+          const studentClass = await classesModel.findOne({ class: studentDetails.class }).lean();
+          if (!studentClass) {
+               return res.status(404).json({ message: "Class not found" });
+          }
+          //find student semester and assignments accordingly
+          const studentSemester = studentClass.semesters.find(sem => sem.semester == studentDetails.classSemester);
+          if( !studentSemester || !studentSemester.assignments) {
+               return res.status(404).json({ message: "Study material not found for the specified semester" });
+          }
+          return res.status(200).json({
+               message: "assignments fetched successfully",
+               assignments: studentSemester.assignments
+          });
+     }catch(e){
+          console.error("Error fetching assignments:", e);
+          return res.status(500).json({ message: "Internal server error" });
+     }
+}

@@ -1,31 +1,52 @@
+/**
+ * @fileoverview Student Authentication Module
+ * Contains functions for student login, token refresh, and authentication middleware
+ */
+
 import studentsModel from "../../../../db/models/students.model.js";
-import { jwtSign, jwtVerify } from "../../../../configs/jwt.config.js";
 import { cookieOptions } from "../../../../configs/cookie.config.js";
+import { 
+     jwtSign,
+     jwtVerify
+     } from "../../../../configs/jwt.config.js";
 
-/** loginStudent function 
- * This function handles the student login process.
- * It checks if the roll number and phone number are provided,
- * validates them against the database,
- * and generates a JWT token if the credentials are valid.
- * It then sets the token in a cookie and returns the student details.
+/**
+ * Handles student login authentication
+ * 
+ * Validates student credentials (roll number and phone number) against the database,
+ * generates a JWT token upon successful authentication, and sets it in a secure cookie.
+ * 
+ * @async
+ * @function loginStudent
+ * @param {Object} req - Express request object
+ * @param {Object} req.body - Request body containing login credentials
+ * @param {Number} req.body.rollNo - Student's roll number
+ * @param {Number} req.body.phone - Student's phone number
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response with login status and student details
+ * 
+ * @throws {400} When roll number or phone number is missing
+ * @throws {404} When student credentials are invalid
+ * @throws {500} When internal server error occurs
+ * 
+ * @example
+ * * Request body
+ * {
+ *   "rollNo": 2021001,
+ *   "phone": 9876543210
+ * }
+ * 
+ * * Success response
+ * {
+ *   "message": "Login successful",
+ *   "student": {
+ *     "name": "John Doe",
+ *     "rollNo": 2021001,
+ *     "email": "john@example.com",
+ *      ... other student details
+ *   }
+ * }
  */
-
-/**refreshStudentToken function
- * this function handles the token refresh process for students and the reloads the data
- * It checks if the student token is provided,
- * validates it,
- * and generates a new JWT token if the token is valid.
- * It then sets the new token in a cookie and returns the student details.
- * If the token is invalid or not provided, it returns an error response.
- */
-
-/**AuthenticateStudent function
- * this function is a middleware that authenticates the student
- * by checking the student token in the cookies.
- * It verifies the token and checks if the student exists in the database.
- * If the student is authenticated, it sets the student details in the request object for further use
- */
-
 export const loginStudent = async (req,res)=> {
      try{
           //get the roll number and phone number from request body
@@ -60,6 +81,36 @@ export const loginStudent = async (req,res)=> {
           return res.status(500).json({message: "Internal server error"});
      }
 }
+
+/**
+ * Refreshes student authentication token
+ * Validates the existing student token from cookies, verifies the student's existence
+ * in the database, and generates a new JWT token with extended expiration.
+ * 
+ * @async
+ * @function refreshStudentToken
+ * @param {Object} req - Express request object
+ * @param {Object} req.cookies - Request cookies
+ * @param {string} req.cookies.studentToken - Existing JWT token from cookie
+ * @param {Object} res - Express response object
+ * @returns {Object} JSON response with refreshed token status and student details
+ * 
+ * @throws {401} When no token is provided
+ * @throws {400} When token is invalid
+ * @throws {404} When student is not found
+ * @throws {500} When internal server error occurs
+ * 
+ * @example
+ * * Success response
+ * {
+ *   "message": "Token refreshed successfully",
+ *   "student": {
+ *     "name": "John Doe",
+ *     "rollNo": 2021001,
+ *     * ... other student details
+ *   }
+ * }
+ */
 export const refreshStudentToken = async (req, res) => {
      try {
           //get the student token from cookies
@@ -96,6 +147,32 @@ export const refreshStudentToken = async (req, res) => {
           return res.status(500).json({ message: "Internal server error" });
      }
 }
+
+/**
+ * Authentication middleware for student routes
+ * 
+ * Validates student JWT token from cookies, verifies student existence in database,
+ * and attaches student details to the request object for use in subsequent middleware/routes.
+ * 
+ * @async
+ * @function authenticateStudent
+ * @param {Object} req - Express request object
+ * @param {Object} req.cookies - Request cookies
+ * @param {string} req.cookies.studentToken - JWT token from cookie
+ * @param {Object} res - Express response object
+ * @param {Function} next - Express next middleware function
+ * @returns {void} Calls next() on success or sends error response
+ * 
+ * @throws {401} When no token is provided
+ * @throws {400} When token is invalid
+ * @throws {404} When student is not found
+ * @throws {500} When internal server error occurs
+ * 
+ * @description
+ * On successful authentication, this middleware adds the following to the request object:
+ * - req.studentDetails: Complete student document from database
+
+ */
 export const authenticateStudent = async (req, res, next) => {
      try {
           //get the student token from cookies
