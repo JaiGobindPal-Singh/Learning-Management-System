@@ -7,6 +7,7 @@
 export { loginStudent, refreshStudentToken, authenticateStudent } from "../features/authentication/studentAuth.js";
 import announcementsModel from "../../../db/models/announcements.model.js";
 import classesModel from "../../../db/models/classes.model.js";
+import geminiApi from "../features/AITeacher/gemini.js";
 
 /**getAnnouncements function
  * this function fetches all announcements from the database
@@ -127,6 +128,37 @@ export const getAssignments = async (req, res) => {
           });
      }catch(e){
           console.error("Error fetching assignments:", e);
+          return res.status(500).json({ message: "Internal server error" });
+     }
+}
+
+/**
+ * 
+ * @param {Object} req 
+ * @param {Object} res 
+ * @description This function allows students to ask questions to the AI teacher.
+ * It expects a question in the request body and uses the geminiApi function to get the answer from the AI teacher.
+ * @returns {Object} JSON response with the answer from the AI teacher
+ * 
+ */
+export const askAI = async (req, res) =>{
+     try{
+          const { question } = req.body;
+          if (!question || question.trim() === "") {
+               return res.status(400).json({ message: "Question cannot be empty" });
+          }
+          // Call the geminiApi function to get the response from the AI teacher
+          const response = await geminiApi(question);
+          if (!response) {
+               return res.status(500).json({ message: "Failed to get response from AI teacher" });
+          }
+
+          return res.status(200).json({
+               message: "Response from AI teacher",
+               answer: response
+          });
+     }catch(e){
+          console.error("Error in askAITeacher:", e);
           return res.status(500).json({ message: "Internal server error" });
      }
 }

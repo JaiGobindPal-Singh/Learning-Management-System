@@ -5,6 +5,7 @@
 
 import { Router } from "express";
 import {
+     askAI,
      authenticateStudent,
      loginStudent,
      refreshStudentToken,
@@ -26,4 +27,6 @@ router.get("/announcements", authenticateStudent, getAnnouncements);
 router.get("/group-messages", authenticateStudent, getClassGroupMessages);
 router.get("/study-materials", authenticateStudent, getStudyMaterial);
 router.get("/assignments", authenticateStudent, getAssignments);
+// AI Teacher route
+router.post("/ask-ai",authenticateStudent,askAI)
 export default router;
