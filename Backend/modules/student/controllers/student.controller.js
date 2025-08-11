@@ -162,3 +162,27 @@ export const askAI = async (req, res) =>{
           return res.status(500).json({ message: "Internal server error" });
      }
 }
+
+/**
+ * @description This function retrieves the student details from the request object.
+ * It is used to get the student details after authentication or after refresh page
+ * @param {*} req 
+ * @param {*} res 
+ * @returns student details
+ */
+export const getStudentDetails = async (req, res) => {
+     try{
+          //get the student details from the req 
+          const { studentDetails } = req;
+          if (!studentDetails) {
+               return res.status(404).json({ message: "Student not found" });
+          }
+          return res.status(200).json({
+               message: "Student details fetched successfully",
+               student: studentDetails
+          });
+     }catch(e){
+          console.error("Error fetching student details:", e);
+          return res.status(500).json({ message: "Internal server error" });
+     }
+}

@@ -9,14 +9,17 @@ const app = express();
 
 
 //*middlewares
-app.use(cors());
+app.use(cors({
+     origin: process.env.CLIENT_URL,
+     credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+}));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(cookieParser());
 
 //* routes 
-app.use("/api/v1/students", studentRoutes);
+app.use("/api/v1/student", studentRoutes);
 
 //*a basic route to check if the server is running
 app.get('/', (req, res) => {

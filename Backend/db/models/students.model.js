@@ -21,7 +21,7 @@ const studentSchema = new mongoose.Schema({
           default: "https://www.w3schools.com/howto/img_avatar.png",
      },
      phone:{
-          type: Number,
+          type: String,
           required: true,
           unique: true,
      },

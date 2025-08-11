@@ -12,7 +12,8 @@ import {
      getAnnouncements,
      getClassGroupMessages,
      getStudyMaterial,
-     getAssignments
+     getAssignments,
+     getStudentDetails
 } from "../controllers/student.controller.js";
 
 
@@ -23,6 +24,7 @@ router.post("/login", loginStudent);
 router.get("/refresh-token", refreshStudentToken);
 
 //other routes that require authentication
+router.get("/details", authenticateStudent, getStudentDetails);
 router.get("/announcements", authenticateStudent, getAnnouncements);
 router.get("/group-messages", authenticateStudent, getClassGroupMessages);
 router.get("/study-materials", authenticateStudent, getStudyMaterial);
