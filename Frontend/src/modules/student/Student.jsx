@@ -9,6 +9,7 @@ import MobileNavbar from "./layouts/MobileNavbar";
 import Sidebar from "./layouts/Sidebar";
 import Dashboard from "./components/Dashboard"
 import AItutor from "./components/AItutor";
+import Assignments from "./components/Assignments";
 function Student() {
 
      //* states used in the student module
@@ -39,7 +40,7 @@ function Student() {
                               activeItem === "dashboard" ?
                                    <Dashboard studentDetails={studentDetails} />
                                    : activeItem === "ai Tutor" ?
-                                   <AItutor/> : "under development"
+                                   <AItutor/> :activeItem === "assignments"?<Assignments />: "under development"
                          }
                     </div>
                </div>
