@@ -1,4 +1,4 @@
-import { useParams } from "react-router-dom"
+import { useParams, useNavigate} from "react-router-dom"
 import { useState } from "react";
 import LoginNavbar from "../layouts/LoginNavbar";
 import axiosInstance from "../configs/axiosConfig.js";
@@ -7,6 +7,9 @@ import { setStudentPersonalInfo } from "../modules/student/reduxSlices/studentSl
 function LoginPage() {
      // Initialize Redux dispatch which allow us to dispatch actions to the Redux store
      const dispatch = useDispatch();
+
+     // useNavigate hook allows us to programmatically navigate to different routes
+     const navigate = useNavigate();
 
      // Extract userType from the URL parameters
      const { userType } = useParams();
@@ -32,6 +35,7 @@ function LoginPage() {
                     console.log("Login successful:", response.data.student);
                }
                //todo: handle the response for teacher and admin login later
+               navigate("/"); // Navigate to the home page after successful login
           } catch (error) {
                console.error("Login failed:", error.response);
                alert("Login failed." + error.response.data.message);

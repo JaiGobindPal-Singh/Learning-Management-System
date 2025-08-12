@@ -1,5 +1,8 @@
 import { createSlice } from '@reduxjs/toolkit'
 
+// This file defines a Redux slice for managing student-related state
+// It includes reducers for student personal information and educational resources
+// This state will hold student personal information and resources like messages, materials, assignments, and announcements
 const initialState = {
      studentInfo:{
           name: '',
