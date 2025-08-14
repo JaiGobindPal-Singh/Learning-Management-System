@@ -10,7 +10,7 @@
 export default function Dashboard({studentDetails}) {
      return (
           <div>
-               <div className="flex justify-center items-center h-screen max-sm:h-[91dvh] w-full bg-gradient-to-br from-blue-50 to-violet-100 p-4">
+               <div className="flex justify-center items-center h-[92dvh] w-full bg-gradient-to-br from-blue-50 to-violet-100 p-4">
                     <div className="bg-white rounded-lg shadow-lg p-6 w-full max-w-sm border border-violet-200">
                          <div className="flex flex-col items-center mb-6">
                               <div className="w-32 h-32 rounded-full overflow-hidden mb-4 border-2 border-violet-500 shadow-md">

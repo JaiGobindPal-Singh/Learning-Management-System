@@ -39,22 +39,22 @@ function App() {
   return (
     <>
       <Routes>
-        {/* Define routes here */}
+        {/* Route to redirect based on authentication */}
         <Route path="/" element={
-          studentDetails.name ? <Navigate to="/student" replace /> :
-          <Navigate to="/login/student" replace />
+          studentDetails.name ? <Navigate to="/student" replace /> : <Navigate to="/login/student" replace />
         } />
-        
+
+        {/* Login route - protected from authenticated users */}
         <Route path="/login/:userType/*" element={
-          studentDetails.name? <Navigate to="/student" replace /> : <LoginPage/>
+          studentDetails.name ? <Navigate to="/student" replace /> : <LoginPage />
         } />
 
+        {/* Student routes - protected from unauthenticated users */}
         <Route path="/student/*" element={
-          studentDetails.name? <Student/> : <Navigate to="/login/student"/>
-        }/>
+          studentDetails.name ? <Student /> : <Navigate to="/login/student" replace />
+        } />
 
-
-        {/* route to handle the invalid paths  */}
+        {/* Route to handle invalid paths */}
         <Route path="*" element={<h1>invalid path</h1>} />
       </Routes>
     </>

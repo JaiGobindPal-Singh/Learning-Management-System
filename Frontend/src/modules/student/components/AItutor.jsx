@@ -1,0 +1,118 @@
+import axiosInstance from "../../../configs/axiosConfig.js"
+import { useSelector } from "react-redux";
+import { useState, useRef } from "react"
+import { marked } from "marked";
+function AItutor() {
+     const [inputMessage, setInputMessage] = useState("");  // This state is used to store the input message from the user
+     const [inputQuery, setInputQuery] = useState("");      // This state is used to store the query that will be sent to the AI
+     const [awaitingResponse, setAwaitingResponse] = useState(false);   // This state is used to indicate whether the AI is processing the request
+     const [responseMessage, setResponseMessage] = useState("");        // This state is used to store the response message from the AI
+     const studentName = useRef(""); // This is used to store the name of the student, can be fetched from the Redux store used useRef to  prevent infinite re-renders
+
+     // Fetch the student details from the Redux store
+     const studentDetails = useSelector((state) => state.student.studentInfo);
+     studentName.current = studentDetails.name; // Set the student's name from the Redux store
+
+     // Function to handle the send button click
+     async function handleSendButtonClick() {
+          setResponseMessage(""); // Clear the previous response message
+          setAwaitingResponse(true); // Set the awaiting response state to true
+          setInputQuery(inputMessage); // Set the input query to the message entered by the user
+          try{
+               const response = await axiosInstance.post("/student/ask-ai", {
+                    question: inputMessage.trim() // Send the trimmed input message to the AI
+               });
+               // Set the response message from the AI
+               setResponseMessage(marked.parse(response.data.answer));
+               setInputMessage(""); // Clear the input message after sending
+          }catch(error) {
+               console.error("Error sending message to AI:", error);
+               setResponseMessage("Sorry, I couldn't process your request. Please try again");
+          }finally{
+               setAwaitingResponse(false); // Set the awaiting response state to false after processing
+          }
+     }
+     return (
+          <div>
+               <div className="flex flex-col h-[92dvh] bg-gradient-to-r from-blue-200 to-purple-200 p-4">
+                    <div className="flex-1 bg-white rounded-lg shadow-md p-8 mb-4 overflow-y-auto">
+                         <div className="space-y-4">
+
+                              {/* initial message from ai */}
+                              {!inputQuery && !awaitingResponse && !responseMessage &&
+                                   <div className="flex items-start">
+                                        <div className="w-10 h-10 rounded-full bg-blue-400 flex items-center justify-center text-white font-bold">
+                                             AI
+                                        </div>
+                                        <div className="ml-3 bg-blue-50 p-3 rounded-lg max-w-[80%]">
+                                             <p>Hello {studentName.current}! 👋 I'm your AI teacher 🤖. In which topic can I help you today? 🤔</p>
+                                        </div>
+                                   </div>
+                              }
+                              {/* message from user */}
+                              {inputQuery &&
+                                   <div className="flex items-start justify-end">
+                                        <div className="mr-3 bg-purple-50 p-3 rounded-lg max-w-[80%]">
+                                             {inputQuery}
+                                        </div>
+                                        <div className="w-10 h-10 rounded-full bg-purple-400 flex items-center justify-center text-white font-bold">
+                                             You
+                                        </div>
+                                   </div>
+                              }
+
+                              {/*response from AI */}
+                              {(responseMessage || awaitingResponse) &&
+                                   <div className="flex items-start">
+                                        <div className="w-10 h-10 rounded-full bg-blue-400 flex items-center justify-center text-white font-bold">
+                                             AI
+                                        </div>
+                                        <div className="ml-3 bg-blue-50 p-3 rounded-lg max-w-[80%]">
+                                             {responseMessage ? 
+                                             <div>
+                                                  <div dangerouslySetInnerHTML={{ __html: responseMessage }}></div>
+                                                  
+                                             </div> :
+                                                  <div className="flex items-center">
+                                                       <span className="h-2 w-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></span>
+                                                       <span className="h-2 w-2 bg-blue-400 rounded-full animate-bounce mx-1" style={{ animationDelay: '150ms' }}></span>
+                                                       <span className="h-2 w-2 bg-blue-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></span>
+                                                  </div>
+                                             }
+                                        </div>
+                                   </div>
+                              }
+                         </div>
+                    </div>
+
+                    <div className="bg-white rounded-lg shadow-md p-2">
+                         <div className="flex items-center">
+                              <input
+                                   disabled={awaitingResponse} // Disable input when awaiting response
+                                   type="text"
+                                   value={inputMessage}
+                                   onChange={(e) => {setInputMessage(e.target.value);}}
+                                   onKeyDown={(e) => {                                         //handle the enter key to send the message
+                                        if (e.key === 'Enter' && inputMessage.trim() !== "") {
+                                             handleSendButtonClick();
+                                        }
+                                   }}
+                                   className="flex-1 border border-gray-200 rounded-l-lg py-2 px-4 max-sm:px-2 focus:outline-none focus:ring-2 focus:ring-blue-300"
+                                   placeholder={awaitingResponse?"please wait while previous query is being processed...":"Ask your question here..."}
+                              />
+                              <button 
+                              onClick={handleSendButtonClick}
+                              disabled={awaitingResponse}
+                              className="bg-gradient-to-r from-blue-400 to-purple-400 text-white py-2 px-2 rounded-r-lg hover:opacity-90 transition-opacity">
+                                   <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 19l9 2-9-18-9 18 9-2zm0 0v-8" />
+                                   </svg>
+                              </button>
+                         </div>
+                    </div>
+               </div>
+          </div>
+     )
+}
+
+export default AItutor
