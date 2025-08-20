@@ -3,26 +3,11 @@
  * @component Assignments
  * @description Displays a list of assignments for the student.
  */
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
+import axiosInstance from "../../../configs/axiosConfig.js"
+import { useDispatch } from "react-redux";
+import { setAssignments } from '../reduxSlices/studentSlice.js';
 
-//todo: fetch the assignments from the API server
-//*sample data for testing
-const assignments = [
-     {
-          id: 1,
-          title: 'Math Assignment 1',
-          description: 'Solve all questions from chapter 2.',
-          dueDate: '2024-06-15',
-          subject: 'Mathematics'
-     },
-     {
-          id: 2,
-          title: 'Science Project',
-          description: 'Prepare a model of the solar system.',
-          dueDate: '2024-06-20',
-          subject: 'Science'
-     }
-];
 
 //*assignment card component
 function AssignmentCard({ assignment, onClick }) {
@@ -73,7 +58,7 @@ function AssignmentDetailsModal({ assignment, onClose }) {
                     {/* <p><strong>Subject:</strong> {assignment.subject}</p> */}
                     <p><strong>Description:</strong> {assignment.description}</p>
                     <p><strong>Deadline:</strong> {assignment.dueDate}</p>
-                    <button  className='border-2 px-2 py-[0.5] rounded border-blue-700
+                    <button className='border-2 px-2 py-[0.5] rounded border-blue-700
                     ' onClick={onClose} style={{ marginTop: 16 }}>Close</button>
                </div>
           </div>
@@ -81,20 +66,27 @@ function AssignmentDetailsModal({ assignment, onClose }) {
 }
 
 //*displays the list of the assignments
-function AssignmentsList() {
+function AssignmentsList({ assignments }) {
      const [selected, setSelected] = useState(null);
 
      return (
           <>
-               <div className='assignments-list p-20'>
-
-                    {assignments.map(a => (
-                         <AssignmentCard
-                              key={a.id}
-                              assignment={a}
-                              onClick={() => setSelected(a)}
-                         />
-                    ))}
+               <div className="assignments-list max-w-3xl mx-auto mt-12 p-8 bg-white rounded-3xl shadow-lg">
+                    <h2 className="text-3xl font-bold mb-8 text-blue-800 text-center tracking-tight">
+                         Your Assignments
+                    </h2>
+                    {assignments.length === 0 && (
+                         <p className="text-gray-500 text-center py-8">No assignments found.</p>
+                    )}
+                    <div className="space-y-6">
+                         {assignments.map((a) => (
+                              <AssignmentCard
+                                   key={a.id}
+                                   assignment={a}
+                                   onClick={() => setSelected(a)}
+                              />
+                         ))}
+                    </div>
                     <AssignmentDetailsModal
                          assignment={selected}
                          onClose={() => setSelected(null)}
@@ -106,9 +98,32 @@ function AssignmentsList() {
 
 //* main component to render
 function Assignments() {
+     const [assignmentsFromResponse, setAssignmentsFromResponse] = useState([]);
+     const dispatch = useDispatch();
+     const [loading, setLoading] = useState(true);
+
+     // fetch the assignments from the backend and store it in the store
+     useEffect(() => {
+          setLoading(true);
+          axiosInstance.get("/student/assignments")
+               .then(response => {
+                    dispatch(setAssignments(response.data.assignments));
+                    setAssignmentsFromResponse(response.data.assignments);
+               })
+               .catch(error => {
+                    console.error("Error fetching assignments:", error);
+               })
+               .finally(() => {
+                    setLoading(false);
+               });
+     }, [dispatch]);
+
+     //todo
+     if (loading) return <div>Loading...</div>
      return (
           <div>
-               <AssignmentsList />
+
+               <AssignmentsList assignments={assignmentsFromResponse} />
           </div>
      )
 }
