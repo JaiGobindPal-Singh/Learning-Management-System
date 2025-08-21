@@ -32,7 +32,6 @@ function LoginPage() {
                })
                if(userType == "student"){
                     dispatch(setStudentPersonalInfo(response.data.student)); // Dispatching the student info to the Redux store
-                    console.log("Login successful:", response.data.student);
                }
                //todo: handle the response for teacher and admin login later
                navigate("/"); // Navigate to the home page after successful login
